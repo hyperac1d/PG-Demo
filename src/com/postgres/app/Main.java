@@ -11,6 +11,8 @@ import java.awt.Toolkit;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import static java.sql.DriverManager.getConnection;
+import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
@@ -18,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -32,9 +35,9 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         UIC.DateChooser.setReadOnly(dcbday);
         //custom initialization
-        PG.url = "jdbc:postgresql://localhost:5432/oten";
+        PG.url = "jdbc:postgresql://localhost:8000/student";
         PG.username = "postgres";
-        PG.password = "123";
+        PG.password = "1234";
         PG.className = "org.postgresql.Driver";
         
         
@@ -70,12 +73,13 @@ public class Main extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblTask = new javax.swing.JTable();
         lblIMAGE = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnInsert = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnReset = new javax.swing.JButton();
+        btnUpdate = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         lblID = new javax.swing.JLabel();
+        btnDelete1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -148,13 +152,13 @@ public class Main extends javax.swing.JFrame {
         lblIMAGE.setOpaque(true);
         jPanel1.add(lblIMAGE, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 50, 150, 120));
 
-        jButton1.setText("INSERT");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnInsert.setText("INSERT");
+        btnInsert.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnInsertActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 340, 80, -1));
+        jPanel1.add(btnInsert, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 340, 80, -1));
 
         jButton2.setText("browse");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -164,16 +168,34 @@ public class Main extends javax.swing.JFrame {
         });
         jPanel1.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 180, 80, -1));
 
-        jButton3.setText("DELETE");
-        jPanel1.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 370, 80, -1));
+        btnReset.setText("RESET");
+        btnReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResetActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnReset, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 370, 80, -1));
 
-        jButton4.setText("UPDATE");
-        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 340, 80, -1));
+        btnUpdate.setText("UPDATE");
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 340, 80, -1));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         jLabel4.setText("ID:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 30, 30));
         jPanel1.add(lblID, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 100, 30));
+
+        btnDelete1.setText("DELETE");
+        btnDelete1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelete1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnDelete1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 370, 80, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -231,7 +253,7 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnInsertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertActionPerformed
         // TODO add your handling code here:
             String name = txtname.getText();
             String con = txtcontact.getText();
@@ -255,7 +277,7 @@ public class Main extends javax.swing.JFrame {
         
         
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnInsertActionPerformed
 
     private void tblTaskMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTaskMouseClicked
         // TODO add your handling code here:
@@ -272,7 +294,7 @@ public class Main extends javax.swing.JFrame {
         txtcontact.setText(records[0][2]);
         String date = records[0][3];
         try {
-            java.util.Date date2 = new SimpleDateFormat("MM dd, yy").parse(date);
+            java.util.Date date2 = new SimpleDateFormat("MMM dd, yyyy").parse(date);
             dcbday.setDate(date2);
         } catch (ParseException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -280,19 +302,88 @@ public class Main extends javax.swing.JFrame {
         
         
         try{
-            byte[] in = PG.read("profile", "image", id, lblIMAGE);
-            ImageIcon icon =new ImageIcon(in);
-
-            //stretching image
-            Image image = icon.getImage();
-            Image scaledImage = image.getScaledInstance(lblIMAGE.getWidth(),lblIMAGE.getHeight(), Image.SCALE_DEFAULT);                                                                
-            lblIMAGE.setIcon(new javax.swing.ImageIcon(scaledImage));  
+            PG.conn = getConnection(PG.url, PG.username, PG.password);
+            PG.stmt = PG.conn.createStatement();
+            ResultSet rs = PG.stmt.executeQuery("SELECT image FROM profile WHERE id="+id);
+            if(rs.next()){
+                byte[] in = rs.getBytes("image");
+                ImageIcon icon =new ImageIcon(in);
+                if(in==null){
+                    System.out.println("no image");
+                }
+                //stretching image
+                Image image = icon.getImage();
+                Image scaledImage = image.getScaledInstance(lblIMAGE.getWidth(),lblIMAGE.getHeight(), Image.SCALE_DEFAULT);                                                                
+                lblIMAGE.setIcon(new javax.swing.ImageIcon(scaledImage)); 
+            }else{
+                lblIMAGE.setIcon(null);
+            }
+            //byte[] in = PG.read("profile", "image", id, lblIMAGE);
+//            ImageIcon icon =new ImageIcon(in);
+//
+//            //stretching image
+//            Image image = icon.getImage();
+//            Image scaledImage = image.getScaledInstance(lblIMAGE.getWidth(),lblIMAGE.getHeight(), Image.SCALE_DEFAULT);                                                                
+//            lblIMAGE.setIcon(new javax.swing.ImageIcon(scaledImage));  
         }
         catch(Exception e){
             System.out.println("Image Error: " + e.getMessage());
         }
        
     }//GEN-LAST:event_tblTaskMouseClicked
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+        // TODO add your handling code here:
+        int id = UIC.Table.getSelectedRow(tblTask);
+        
+        String name = txtname.getText();
+        String contact = txtcontact.getText();
+        String bdate = UIC.DateChooser.getDate(dcbday);
+        byte[] image = this.imgdata;
+        Object[] values = {name, contact, bdate, image, id};
+        String query = "UPDATE profile SET name=? ,contactno=?, birthdate=?, image=? WHERE id=?";
+        if(PG.executeDML(query, values)){
+            JOptionPane.showMessageDialog(null, "profile successfully updated!");
+            String[] columns = {"ID","NAME","CONTACTNO","BIRTHDATE"};
+            String whereClause = "1=1";
+            String[][] records = PG.executeDQL("profile", columns, whereClause);
+            UIC.Table.setModel(tblTask, records, columns); 
+        }else{
+            JOptionPane.showMessageDialog(null, "profile update error!");
+        }
+        
+    }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
+        // TODO add your handling code here:
+        txtname.setText("");
+        txtcontact.setText("");
+        dcbday.setDate(null);
+        lblIMAGE.setIcon(null);
+    }//GEN-LAST:event_btnResetActionPerformed
+
+    private void btnDelete1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelete1ActionPerformed
+        // TODO add your handling code here:
+        int id = UIC.Table.getSelectedRow(tblTask);
+        Object[] values = {id};
+        String query = "DELETE FROM profile WHERE id=?";
+        if(PG.executeDML(query, values)){
+            javax.swing.JOptionPane.showMessageDialog(null, "Student Profile Removed!");
+
+            lblID.setText("0");
+            txtname.setText("");
+            txtcontact.setText("");
+            dcbday.setDate(null);
+            lblIMAGE.setIcon(null);
+            String[] columns = {"ID","NAME","CONTACTNO","BIRTHDATE"};
+            String whereClause = "1=1";
+            String[][] records = PG.executeDQL("profile", columns, whereClause);
+            UIC.Table.setModel(tblTask, records, columns);
+        }
+        else{
+            javax.swing.JOptionPane.showMessageDialog(null, "An error occured while removing student profile.");
+        } 
+    }//GEN-LAST:event_btnDelete1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -330,11 +421,12 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDelete1;
+    private javax.swing.JButton btnInsert;
+    private javax.swing.JButton btnReset;
+    private javax.swing.JButton btnUpdate;
     private com.toedter.calendar.JDateChooser dcbday;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
